@@ -11,6 +11,10 @@ export default (editor, options = {}) => {
     // Label for the image editor (used in the modal)
     labelImageEditor: 'Image Editor',
 
+    // pass function to get image url. By default, this.target.get("src") will be called
+    // must return either an image url or a standard url, receives this.target as an argument
+    getImageURL: null,
+
     // Label used on the apply button
     labelApply: 'Apply',
 
@@ -170,7 +174,7 @@ export default (editor, options = {}) => {
 
     getEditorConfig() {
       const config = { ...opts.config };
-      const path = this.target.get('src');
+      const path = typeof opts.getImageURL === "function" ? opts.getImageURL(this.target) : this.target.get('src');
 
       if (!config.includeUI) config.includeUI = {};
       config.includeUI = {
