@@ -2,5 +2,6 @@
 private/
 node_modules/
 .eslintrc
+.idea/
 *.log
 _index.html
