@@ -9,17 +9,14 @@
     "build": "npm run v:patch && webpack --env.production",
     "start": "webpack-dev-server --open --progress --colors"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/artf/grapesjs-tui-image-editor.git"
-  },
+  "repository": "https://github.com/leejroberts/grapes-tui-image-editor",
   "keywords": [
     "grapesjs",
     "plugin",
     "image",
     "editor"
   ],
-  "author": "Artur Arseniev",
+  "author": "Lee Roberts (test clone for changes to Artur Arseniev's original repo) ",
   "license": "BSD-3-Clause",
   "babel": {
     "presets": [
@@ -40,5 +37,6 @@
     "webpack": "^4.29.5",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14"
-  }
+  },
+  "private": true
 }

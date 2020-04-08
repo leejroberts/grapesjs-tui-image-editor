@@ -160,7 +160,10 @@ export default (editor, options = {}) => {
       const btn = content.children[1];
       ed.Modal.open({ title, content })
         .getModel().once('change:open', () => ed.stopCommand(id));
-      this.imageEditor = new constr(content.children[0], this.getEditorConfig());
+      // wait for image path to create editor
+      this.getImagePath().then(imagePath => {
+        this.imageEditor = new constr(content.children[0], this.getEditorConfig(imagePath));
+      });
       ed.getModel().setEditing(1);
       btn.onclick = () => this.applyChanges();
       opts.onApplyButton(btn);
@@ -172,10 +175,8 @@ export default (editor, options = {}) => {
       ed.getModel().setEditing(0);
     },
 
-    getEditorConfig() {
+    getEditorConfig(path) {
       const config = { ...opts.config };
-      const path = typeof opts.getImageURL === "function" ? opts.getImageURL(this.target) : this.target.get('src');
-
       if (!config.includeUI) config.includeUI = {};
       config.includeUI = {
         theme: {},
@@ -190,6 +191,19 @@ export default (editor, options = {}) => {
       }
 
       return config;
+    },
+
+    // convert all images src's to dataURL's for editor
+    // reason: so that AWS S3 bucket does not fail CORS requests from within the tui-image-editor itself
+    // cors request will *always* fail if cached in Chrome and Safari, thus the fetch must be { cache: "no-store" }
+    async getImagePath() {
+      const imageSrc = this.target.get('src');
+      const isDataURL = imageSrc.split(":")[0] === 'data';
+      if (isDataURL) { return imageSrc; }
+
+      let imageResponse = await fetch(imageSrc, { cache: "no-store" }).then(resp => resp);
+      let responseBlob = await imageResponse.blob().then(blob => blob);
+      return await this.blobToDataURL(responseBlob).then(result => result);
     },
 
     createContent() {
@@ -255,6 +269,14 @@ export default (editor, options = {}) => {
     applyToTarget(result) {
       this.target.set({ src: result });
       this.editor.Modal.close();
+    },
+
+    blobToDataURL(blob) {
+      return new Promise(resolve => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => resolve(fileReader.result);
+        fileReader.readAsDataURL(blob);
+      });
     },
 
     dataUrlToBlob(dataURL) {

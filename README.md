@@ -1,3 +1,7 @@
+# IMPORTANT!
+# this yarn package is a FORK of the https://classic.yarnpkg.com/en/package/grapesjs-tui-image-editor
+# these are very likely not the droids you're looking for
+
 # GrapesJS TOAST UI Image Editor
 
 Add the [TOAST UI Image Editor](https://ui.toast.com/tui-image-editor/) on Image Components in GrapesJS
