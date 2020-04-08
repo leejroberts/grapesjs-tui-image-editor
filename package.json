@@ -1,7 +1,7 @@
 {
-  "name": "grapesjs-tui-image-editor",
+  "name": "leejr-grapesjs-tui-image-editor",
   "version": "0.1.3",
-  "description": "GrapesJS TOAST UI Image Editor",
+  "description": "Fork of GrapesJS TOAST UI Image Editor",
   "main": "dist/grapesjs-tui-image-editor.min.js",
   "scripts": {
     "lint": "eslint src",
@@ -38,5 +38,6 @@
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.1.14"
   },
-  "private": true
+  "private": false
 }
+
