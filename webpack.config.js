@@ -28,8 +28,8 @@ module.exports = (env = {}) => {
     devtool: isProd ? 'source-map' : 'cheap-module-eval-source-map',
     output: {
         path: path.resolve(__dirname),
-        filename: `dist/${name}.min.js`,
-        library: name,
+        filename: `dist/grapesjs-tui-image-editor.min.js`,
+        library: 'grapesjs-tui-image-editor',
         libraryTarget: 'umd',
     },
     module: {
