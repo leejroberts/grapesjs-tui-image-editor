@@ -1,8 +1,8 @@
 {
   "name": "leejr-grapesjs-tui-image-editor",
-  "version": "0.1.5",
+  "version": "0.1.81",
   "description": "Fork of GrapesJS TOAST UI Image Editor",
-  "main": "dist/grapesjs-tui-image-editor.min.js",
+  "main": "dist/leejr-grapesjs-tui-image-editor.min.js",
   "scripts": {
     "lint": "eslint src",
     "v:patch": "npm version --no-git-tag-version patch",
@@ -11,10 +11,7 @@
   },
   "repository": "https://github.com/leejroberts/grapes-tui-image-editor",
   "keywords": [
-    "grapesjs",
-    "plugin",
-    "image",
-    "editor"
+    "leejr"
   ],
   "author": "Lee Roberts (test clone for changes to Artur Arseniev's original repo) ",
   "license": "BSD-3-Clause",
