@@ -1,6 +1,6 @@
 {
   "name": "leejr-grapesjs-tui-image-editor",
-  "version": "0.1.81",
+  "version": "0.1.812",
   "description": "Fork of GrapesJS TOAST UI Image Editor",
   "main": "dist/leejr-grapesjs-tui-image-editor.min.js",
   "scripts": {
