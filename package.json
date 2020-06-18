@@ -1,6 +1,6 @@
 {
   "name": "leejr-grapesjs-tui-image-editor",
-  "version": "0.1.812",
+  "version": "0.1.814",
   "description": "Fork of GrapesJS TOAST UI Image Editor",
   "main": "dist/leejr-grapesjs-tui-image-editor.min.js",
   "scripts": {
@@ -32,8 +32,8 @@
     "eslint": "^5.14.1",
     "html-webpack-plugin": "^3.2.0",
     "webpack": "^4.29.5",
-    "webpack-cli": "^3.2.3",
-    "webpack-dev-server": "^3.1.14"
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
   },
   "private": false
 }

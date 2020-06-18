@@ -18,11 +18,23 @@ export default (editor, options = {}) => {
     // Label used on the apply button
     labelApply: 'Apply',
 
+    // Label used on the fullscreen button
+    labelFullscreen: `Fullscreen`,
+
     // Default editor height
     height: '650px',
 
     // Default editor width
     width: '100%',
+
+    // Default full screen height
+    fsHeight: '95vh',
+
+    // Default full screen width
+    fsWidth: '100%',
+
+    // Setting to whether full screen mode should be exited when the apply button is hit
+    exitFullScreenOnApply: true,
 
     // Id to use to create the image editor command
     commandId: 'tui-image-editor',
@@ -157,7 +169,8 @@ export default (editor, options = {}) => {
       this.target = options.target || ed.getSelected();
       const content = this.createContent();
       const title = opts.labelImageEditor;
-      const btn = content.children[1];
+      const applyBtn = content.querySelector('#tui-image-apply');
+      const fullscreenBtn = content.querySelector('#tui-image-full-screen');
       ed.Modal.open({ title, content })
         .getModel().once('change:open', () => ed.stopCommand(id));
       // wait for image path to create editor
@@ -165,8 +178,10 @@ export default (editor, options = {}) => {
         this.imageEditor = new constr(content.children[0], this.getEditorConfig(imagePath));
       });
       ed.getModel().setEditing(1);
-      btn.onclick = () => this.applyChanges();
-      opts.onApplyButton(btn);
+      applyBtn.onclick = () => this.applyChanges();
+      fullscreenBtn.onclick = () => this.toggleFullscreen();
+      this.addFullScreenChangeHandler();
+      opts.onApplyButton(applyBtn);
     },
 
     stop(ed) {
@@ -178,11 +193,19 @@ export default (editor, options = {}) => {
     getEditorConfig(path) {
       const config = { ...opts.config };
       if (!config.includeUI) config.includeUI = {};
+      const fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+      let uiSizeOpts = {};
+      if (fullscreenElement) {
+        uiSizeOpts = { height: opts.fsHeight, width: opts.fsWidth };
+      } else {
+        uiSizeOpts = { height: opts.height, width: opts.width };
+      }
+
       config.includeUI = {
         theme: {},
         ...config.includeUI,
         loadImage: { path, name: 1 },
-        uiSize: { height, width },
+        uiSize: uiSizeOpts,
       };
       if (hideHeader) config.includeUI.theme['header.display'] = 'none';
       if (icons) config.includeUI.theme = {
@@ -211,7 +234,7 @@ export default (editor, options = {}) => {
       content.style = 'position: relative';
       content.innerHTML = `
         <div></div>
-        <button class="tui-image-editor__apply-btn" style="
+        <button id="tui-image-apply" class="tui-image-editor__apply-btn" style="
           position: absolute;
           top: 0; right: 0;
           margin: 10px;
@@ -223,7 +246,20 @@ export default (editor, options = {}) => {
           cursor: pointer
         ">
           ${opts.labelApply}
-        </botton>
+        </button>
+        <button id="tui-image-full-screen" class="tui-image-editor__apply-btn" style="
+          position: absolute;
+          top: 0; right: 120px;
+          margin: 10px;
+          background-color: #fff;
+          font-size: 1rem;
+          border-radius: 3px;
+          border: none;
+          padding: 10px 20px;
+          cursor: pointer
+        ">
+          ${opts.labelFullscreen}
+        </button>
       `;
 
       return content;
@@ -242,6 +278,13 @@ export default (editor, options = {}) => {
           });
         } else {
           this.uploadImage(imageEditor, target, AssetManager);
+        }
+      }
+
+      if (opts.exitFullScreenOnApply) {
+        const fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+        if (fullscreenElement) {
+          this.exitFsMode();
         }
       }
     },
@@ -291,6 +334,67 @@ export default (editor, options = {}) => {
       }
 
       return new Blob([ab], { type });
+    },
+
+    // resets the image editor UI size when entering/exiting fullscreen
+    addFullScreenChangeHandler() {
+      const that = this;
+      // Add callback to handle fullscreen change
+      if (document.addEventListener) {
+        document.addEventListener('webkitfullscreenchange', handleFsChange, false);
+        document.addEventListener('mozfullscreenchange', handleFsChange, false);
+        document.addEventListener('fullscreenchange', handleFsChange, false);
+        document.addEventListener('MSFullscreenChange', handleFsChange, false);
+      }
+
+      function handleFsChange() {
+        const fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+        const imageEditorUiSizeOpts = {};
+        if (!fullscreenElement) {
+          imageEditorUiSizeOpts['uiSize'] = { width: opts.width, height: opts.height };
+        } else {
+          imageEditorUiSizeOpts['uiSize'] = { width: opts.fsWidth, height: opts.fsHeight };
+        }
+
+        that.imageEditor.ui.resizeEditor(imageEditorUiSizeOpts);
+      }
+    },
+
+    toggleFullscreen() {
+      const modalContentEl = this.editor.Modal.getContentEl();
+      let modalDialogEl = modalContentEl && modalContentEl.parentElement && modalContentEl.parentElement.parentElement ?
+        modalContentEl.parentElement.parentElement :
+        modalContentEl;
+
+      const fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+
+      if (fullscreenElement) {
+        this.exitFsMode();
+      } else {
+        if (modalDialogEl) {
+          if (modalDialogEl.requestFullscreen) {
+            modalDialogEl.requestFullscreen();
+          } else if (modalDialogEl.webkitRequestFullscreen) {
+            modalDialogEl.webkitRequestFullscreen();
+          } else if (modalDialogEl.mozRequestFullScreen) {
+            modalDialogEl.mozRequestFullScreen();
+          } else if (modalDialogEl.msRequestFullscreen) {
+            modalDialogEl.msRequestFullscreen();
+          }
+        }
+      }
+    },
+
+    exitFsMode() {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
     },
   });
 };
